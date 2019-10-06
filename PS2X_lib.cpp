@@ -210,19 +210,36 @@ byte PS2X::config_gamepad(uint8_t clk, uint8_t cmd, uint8_t att, uint8_t dat, bo
     
    CMD_SET(); // SET(*_cmd_oreg,_cmd_mask);
    CLK_SET();
+
+   Serial.println("PS2X_lib.cpp starting");
    
    //new error checking. First, read gamepad a few times to see if it's talking
    read_gamepad();
    read_gamepad();
+   read_gamepad();
+   read_gamepad();
+   read_gamepad();
+   read_gamepad();
+   read_gamepad();
+   read_gamepad();
+   read_gamepad();
+   read_gamepad();
+   read_gamepad();
+   read_gamepad();
+   read_gamepad();
+   read_gamepad();
+   read_gamepad();
+   read_gamepad();
    
+
    //see if it talked
    if(PS2data[1] != 0x41 && PS2data[1] != 0x73 && PS2data[1] != 0x79){ //see if mode came back. If still anything but 41, 73 or 79, then it's not talking
-      #ifdef PS2X_DEBUG
+      // #ifdef PS2X_DEBUG
 		Serial.println("Controller mode not matched or no controller found");
 		Serial.print("Expected 0x41 or 0x73, got ");
 		Serial.println(PS2data[1], HEX);
-	  #endif
-	 
+	//   #endif
+   //  Serial.println("No controller found, check wiring, readme.txt-> enable debug");	 
 	 return 1; //return error code 1
 	}
   
@@ -261,6 +278,7 @@ byte PS2X::config_gamepad(uint8_t clk, uint8_t cmd, uint8_t att, uint8_t dat, bo
 	if(PS2data[1] == 0x79)
 		break;
 	if(PS2data[1] == 0x73)
+      //  Serial.println("Controller refusing Pressures mode- may not support it");
 		return 3;
    }
    
@@ -268,11 +286,12 @@ byte PS2X::config_gamepad(uint8_t clk, uint8_t cmd, uint8_t att, uint8_t dat, bo
       break;
       
     if(y == 10){
-		#ifdef PS2X_DEBUG
+		// #ifdef PS2X_DEBUG
 		Serial.println("Controller not accepting commands");
 		Serial.print("mode stil set at");
 		Serial.println(PS2data[1], HEX);
-		#endif
+		// #endif
+      //Serial.println("Controller found but not accepting commands. readme.txt-> enable debug");
       return 2; //exit function with error
 	  }
     
@@ -309,12 +328,14 @@ void PS2X::sendCommandString(byte string[], byte len) {
   
   #else
   ATT_CLR(); // low enable joystick
+  delay(read_delay);                  //wait a few
   for (int y=0; y < len; y++)
+   {
     _gamepad_shiftinout(string[y]);
-    
-   ATT_SET(); //high disable joystick  
-   delay(read_delay);                  //wait a few
-   #endif
+   } 
+  ATT_SET(); //high disable joystick  
+  delay(read_delay);                  //wait a few
+  #endif
 }
 
  

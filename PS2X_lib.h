@@ -76,8 +76,8 @@ GNU General Public License for more details.
 // $$$$$$$$$$$$ DEBUG ENABLE SECTION $$$$$$$$$$$$$$$$
 // to debug ps2 controller, uncomment these two lines to print out debug to uart
 
-//#define PS2X_DEBUG
-//#define PS2X_COM_DEBUG
+// #define PS2X_DEBUG
+// #define PS2X_COM_DEBUG
 
 
 #ifndef PS2X_lib_h
@@ -99,9 +99,9 @@ GNU General Public License for more details.
 #else
 // Pic32...
 #include <pins_arduino.h>
-#define CTRL_CLK        6 //5
-#define CTRL_CLK_HIGH   6 //5
-#define CTRL_BYTE_DELAY 5 //4
+#define CTRL_CLK        7 //6 //5
+#define CTRL_CLK_HIGH   7 //6 //5
+#define CTRL_BYTE_DELAY 6 //5 //4
 #endif 
 
 //These are our button constants

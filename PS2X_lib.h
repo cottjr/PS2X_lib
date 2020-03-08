@@ -72,6 +72,10 @@ GNU General Public License for more details.
 *  
 ******************************************************************/
 
+// Reasons for 8 March 2020 modifications in commit df8d1ad /  df8d1addefaa6f03ffd6f949fb76c024cd97bfa5 
+// Why? be CAREFUL!!!  the original PS2X Library uses Arduino delay() -> which means it apparently depends on Timer0 for the Arduino Mega, which seems to risk interacting with other libraries.!
+// -> starting with commit df8d1ad, this library uses delayMicroseconds(), because delayMicroseconds() works on processor cycles e.g.  https://forum.arduino.cc/index.php?topic=437411.0
+
 
 // $$$$$$$$$$$$ DEBUG ENABLE SECTION $$$$$$$$$$$$$$$$
 // to debug ps2 controller, uncomment these two lines to print out debug to uart

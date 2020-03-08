@@ -226,8 +226,8 @@ volatile uint32_t *		_att_lport_clr;
 uint16_t 				_dat_mask; 
 volatile uint32_t *		_dat_lport;
 #endif
-unsigned long last_read;
-byte read_delay;
+unsigned long last_read;    // milliseconds
+unsigned long read_delay;   // microseconds
 byte controller_type;
 boolean en_Rumble;
 boolean en_Pressures;

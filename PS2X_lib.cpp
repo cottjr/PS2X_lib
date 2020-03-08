@@ -76,13 +76,16 @@ void PS2X::read_gamepad() {
 
 
 boolean PS2X::read_gamepad(boolean motor1, byte motor2) {
-  double temp = millis() - last_read;
+  unsigned long temp = millis() - last_read;
   
-  if (temp > 1500) //waited to long
+  if (temp > 1500) //waited too long -> waited more than 1.5 seconds to read the gamepad
+  {
+   Serial.println("\n about to reconfig_gamepad - but why? \n");
     reconfig_gamepad();
+  }
     
-  if(temp < read_delay)  //waited too short
-    delay(read_delay - temp);
+  if(temp*1000 < read_delay)  //waited too short -> as compared in microseconds
+    delayMicroseconds(read_delay - temp*1000);
     
     
 
@@ -120,13 +123,13 @@ boolean PS2X::read_gamepad(boolean motor1, byte motor2) {
 	
 	// If we got to here, we are not in analog mode, try to recover...
 	reconfig_gamepad();	// try to get back into Analog mode.
-	delay(read_delay);
+	delayMicroseconds(read_delay);
   }
   
   // If we get here and still not in analog mode, try increasing the read_delay...
   if ((PS2data[1] & 0xf0) != 0x70) {
-	if (read_delay < 10)
-		read_delay++;	// see if this helps out...
+	if (read_delay < 10000)
+		read_delay += 1000;	// wait another millisecond -> see if this helps out...
   }	
 
 	
@@ -244,7 +247,7 @@ byte PS2X::config_gamepad(uint8_t clk, uint8_t cmd, uint8_t att, uint8_t dat, bo
 	}
   
   //try setting mode, increasing delays if need be. 
-  read_delay = 1;
+  read_delay = 1000;
   
   for(int y = 0; y <= 10; y++)
   {
@@ -295,7 +298,7 @@ byte PS2X::config_gamepad(uint8_t clk, uint8_t cmd, uint8_t att, uint8_t dat, bo
       return 2; //exit function with error
 	  }
     
-    read_delay += 1; //add 1ms to read_delay
+    read_delay += 1000; //add 1ms to read_delay
   }
    
  return 0; //no error if here
@@ -315,7 +318,7 @@ void PS2X::sendCommandString(byte string[], byte len) {
     temp[y] = _gamepad_shiftinout(string[y]);
     
   ATT_SET(); //high disable joystick  
-   delay(read_delay);                  //wait a few
+   delayMicroseconds(read_delay);                  //wait a few
   
   Serial.println("OUT:IN Configure");
   for(int i=0; i<len; i++){
@@ -328,13 +331,13 @@ void PS2X::sendCommandString(byte string[], byte len) {
   
   #else
   ATT_CLR(); // low enable joystick
-  delay(read_delay);                  //wait a few
+  delayMicroseconds(read_delay);                  //wait a few
   for (int y=0; y < len; y++)
    {
     _gamepad_shiftinout(string[y]);
    } 
   ATT_SET(); //high disable joystick  
-  delay(read_delay);                  //wait a few
+  delayMicroseconds(read_delay);                  //wait a few
   #endif
 }
 
@@ -422,6 +425,7 @@ inline void  PS2X::CLK_SET(void) {
    cli();
    *_clk_oreg |= _clk_mask;
    SREG = old_sreg;
+   sei();
 }
 
 inline void  PS2X::CLK_CLR(void) {
@@ -429,6 +433,7 @@ inline void  PS2X::CLK_CLR(void) {
    cli();
    *_clk_oreg &= ~_clk_mask;
    SREG = old_sreg;
+   sei();
 }
 
 inline void  PS2X::CMD_SET(void) {
@@ -436,6 +441,7 @@ inline void  PS2X::CMD_SET(void) {
    cli();
    *_cmd_oreg |= _cmd_mask; // SET(*_cmd_oreg,_cmd_mask);
    SREG = old_sreg;
+   sei();
 }
 
 inline void  PS2X::CMD_CLR(void) {
@@ -443,6 +449,7 @@ inline void  PS2X::CMD_CLR(void) {
    cli();
    *_cmd_oreg &= ~_cmd_mask; // SET(*_cmd_oreg,_cmd_mask);
    SREG = old_sreg;
+   sei();
 }
 
 inline void  PS2X::ATT_SET(void) {
@@ -450,6 +457,7 @@ inline void  PS2X::ATT_SET(void) {
    cli();
   *_att_oreg |= _att_mask ; 	
    SREG = old_sreg;
+   sei();
 }
 
 inline void PS2X::ATT_CLR(void) {
@@ -457,6 +465,7 @@ inline void PS2X::ATT_CLR(void) {
    cli();
   *_att_oreg &= ~_att_mask; 
    SREG = old_sreg;
+   sei();
 }
 
 inline bool PS2X::DAT_CHK(void) {
